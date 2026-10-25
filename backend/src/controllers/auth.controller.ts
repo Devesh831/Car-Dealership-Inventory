@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role, adminCode } = req.body;
     // Read admin code dynamically to support test environment overrides
-    const ADMIN_CODE = process.env.ADMIN_REGISTRATION_CODE || 'ADMIN_SECRET_2024';
+    const ADMIN_CODE = process.env.ADMIN_REGISTRATION_CODE;
 
     // Check for duplicate username
     const existingUsername = await UserModel.findByUsername(username);
@@ -37,8 +37,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Validate admin code if requesting admin registration
-    const assignedRole =
-      role === 'admin' && adminCode === ADMIN_CODE ? 'admin' : 'user';
+    if (role === 'admin' && (!ADMIN_CODE || adminCode !== ADMIN_CODE)) {
+      res.status(403).json({
+        success: false,
+        message: 'A valid admin registration code is required for an admin account',
+      });
+      return;
+    }
+
+    const assignedRole = role === 'admin' ? 'admin' : 'user';
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);

@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'car_dealership_super_secret_jwt_key_2024_tdd_kata';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET must be configured');
+  return secret;
+};
 
 export interface TokenPayload {
   id: number;
@@ -14,7 +17,9 @@ export interface TokenPayload {
  * Token expires based on JWT_EXPIRES_IN environment variable.
  */
 export const generateToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
+  return jwt.sign(payload, getJwtSecret(), {
+    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+  } as jwt.SignOptions);
 };
 
 /**
@@ -22,5 +27,5 @@ export const generateToken = (payload: TokenPayload): string => {
  * Returns the decoded payload or throws on invalid/expired token.
  */
 export const verifyToken = (token: string): TokenPayload => {
-  return jwt.verify(token, JWT_SECRET) as TokenPayload;
+  return jwt.verify(token, getJwtSecret()) as TokenPayload;
 };

@@ -122,15 +122,15 @@ describe('POST /api/auth/register', () => {
     expect(res.body.data.user.role).toBe('admin');
   });
 
-  it('should default to user role when invalid admin code is provided', async () => {
+  it('should reject admin registration when the admin code is invalid', async () => {
     const res = await request(app).post('/api/auth/register').send({
       ...validUser,
       role: 'admin',
       adminCode: 'WRONG_CODE',
     });
 
-    expect(res.status).toBe(201);
-    expect(res.body.data.user.role).toBe('user');
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
   });
 });
 

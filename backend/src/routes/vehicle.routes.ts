@@ -37,7 +37,7 @@ router.get('/', authenticate, getAllVehicles);
  * @desc    Add a new vehicle to inventory
  * @access  Private
  */
-router.post('/', authenticate, validate(vehicleSchema), createVehicle);
+router.post('/', authenticate, requireAdmin, validate(vehicleSchema), createVehicle);
 
 /**
  * @route   GET /api/vehicles/:id
@@ -51,7 +51,7 @@ router.get('/:id', authenticate, getVehicleById);
  * @desc    Update vehicle details
  * @access  Private
  */
-router.put('/:id', authenticate, validate(vehicleUpdateSchema), updateVehicle);
+router.put('/:id', authenticate, requireAdmin, validate(vehicleUpdateSchema), updateVehicle);
 
 /**
  * @route   DELETE /api/vehicles/:id

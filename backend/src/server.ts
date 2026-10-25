@@ -10,10 +10,14 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
  * Application entry point.
  * Initializes the database connection and starts the HTTP server.
  */
-const startServer = (): void => {
+const startServer = async (): Promise<void> => {
   try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET must be configured before starting the API');
+    }
+
     // Initialize database (creates tables if they don't exist)
-    connectDB();
+    await connectDB();
     console.log('✅ Database connected successfully');
 
     app.listen(PORT, () => {
@@ -27,4 +31,4 @@ const startServer = (): void => {
   }
 };
 
-startServer();
+void startServer();

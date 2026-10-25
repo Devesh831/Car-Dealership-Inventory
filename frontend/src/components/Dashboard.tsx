@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useVehicles } from '../hooks/useVehicles';
 import { VehicleCard } from './vehicles/VehicleCard';
@@ -8,7 +8,7 @@ import { Pagination } from './ui/Pagination';
 import { Modal } from './ui/Modal';
 import type { Vehicle } from '../lib/api';
 
-const EMPTY_FILTERS: SearchFiltersState = { make: '', category: '', minPrice: '', maxPrice: '' };
+const EMPTY_FILTERS: SearchFiltersState = { make: '', model: '', category: '', minPrice: '', maxPrice: '' };
 
 export function Dashboard() {
   const { user, logout } = useAuth();
@@ -48,16 +48,17 @@ export function Dashboard() {
   };
 
   // Load vehicles on first render
-  useState(() => { fetchVehicles(1); });
+  useEffect(() => { void fetchVehicles(1); }, [fetchVehicles]);
 
   const handleSearch = async () => {
     setIsSearching(true);
-    const { make, category, minPrice, maxPrice } = filters;
-    if (!make && !category && !minPrice && !maxPrice) {
+    const { make, model, category, minPrice, maxPrice } = filters;
+    if (!make && !model && !category && !minPrice && !maxPrice) {
       await fetchVehicles(1);
     } else {
       await searchVehicles({
         make: make || undefined,
+        model: model || undefined,
         category: (category as Vehicle['category']) || undefined,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -73,12 +74,13 @@ export function Dashboard() {
   };
 
   const handlePageChange = async (page: number) => {
-    const { make, category, minPrice, maxPrice } = filters;
-    if (!make && !category && !minPrice && !maxPrice) {
+    const { make, model, category, minPrice, maxPrice } = filters;
+    if (!make && !model && !category && !minPrice && !maxPrice) {
       await fetchVehicles(page);
     } else {
       await searchVehicles({
         make: make || undefined,
+        model: model || undefined,
         category: (category as Vehicle['category']) || undefined,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
@@ -268,7 +270,11 @@ export function Dashboard() {
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3 className="text-lg font-semibold text-white mb-1">No vehicles found</h3>
-            <p className="text-gray-400 text-sm">Try adjusting your search filters or add a new vehicle.</p>
+            <p className="text-gray-400 text-sm">
+              {isAdmin
+                ? 'Add your first vehicle to start building the inventory, or adjust your search filters.'
+                : 'There are no vehicles in the inventory yet. Please check back later or adjust your search filters.'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

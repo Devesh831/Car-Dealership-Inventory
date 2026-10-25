@@ -84,7 +84,7 @@ describe('POST /api/vehicles', () => {
   it('should create a vehicle successfully with valid JWT and data', async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validVehicle);
 
     expect(res.status).toBe(201);
@@ -96,6 +96,15 @@ describe('POST /api/vehicles', () => {
     expect(res.body.data.vehicle).toHaveProperty('id');
   });
 
+  it('should return 403 when a regular user tries to create a vehicle', async () => {
+    const res = await request(app)
+      .post('/api/vehicles')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send(validVehicle);
+
+    expect(res.status).toBe(403);
+  });
+
   it('should return 401 when no token is provided', async () => {
     const res = await request(app).post('/api/vehicles').send(validVehicle);
     expect(res.status).toBe(401);
@@ -105,7 +114,7 @@ describe('POST /api/vehicles', () => {
   it('should return 400 when required fields are missing', async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ make: 'Toyota' });
 
     expect(res.status).toBe(400);
@@ -116,7 +125,7 @@ describe('POST /api/vehicles', () => {
   it('should return 400 when price is negative', async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ ...validVehicle, price: -5000 });
 
     expect(res.status).toBe(400);
@@ -126,7 +135,7 @@ describe('POST /api/vehicles', () => {
   it('should return 400 when quantity is negative', async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ ...validVehicle, quantity: -1 });
 
     expect(res.status).toBe(400);
@@ -136,7 +145,7 @@ describe('POST /api/vehicles', () => {
   it('should return 400 when category is invalid', async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ ...validVehicle, category: 'InvalidCategory' });
 
     expect(res.status).toBe(400);
@@ -150,11 +159,11 @@ describe('GET /api/vehicles', () => {
   beforeEach(async () => {
     await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validVehicle);
     await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validSUV);
   });
 
@@ -195,11 +204,11 @@ describe('GET /api/vehicles/search', () => {
   beforeEach(async () => {
     await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validVehicle);
     await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validSUV);
   });
 
@@ -262,7 +271,7 @@ describe('GET /api/vehicles/:id', () => {
   beforeEach(async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validVehicle);
     vehicleId = res.body.data.vehicle.id;
   });
@@ -295,7 +304,7 @@ describe('PUT /api/vehicles/:id', () => {
   beforeEach(async () => {
     const res = await request(app)
       .post('/api/vehicles')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(validVehicle);
     vehicleId = res.body.data.vehicle.id;
   });
@@ -303,7 +312,7 @@ describe('PUT /api/vehicles/:id', () => {
   it('should update vehicle details successfully', async () => {
     const res = await request(app)
       .put(`/api/vehicles/${vehicleId}`)
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ price: 30000, description: 'Updated description' });
 
     expect(res.status).toBe(200);
@@ -316,7 +325,7 @@ describe('PUT /api/vehicles/:id', () => {
   it('should return 404 for non-existent vehicle', async () => {
     const res = await request(app)
       .put('/api/vehicles/99999')
-      .set('Authorization', `Bearer ${userToken}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({ price: 30000 });
 
     expect(res.status).toBe(404);
@@ -329,6 +338,15 @@ describe('PUT /api/vehicles/:id', () => {
       .send({ price: 30000 });
 
     expect(res.status).toBe(401);
+  });
+
+  it('should return 403 when a regular user tries to update a vehicle', async () => {
+    const res = await request(app)
+      .put(`/api/vehicles/${vehicleId}`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ price: 30000 });
+
+    expect(res.status).toBe(403);
   });
 });
 

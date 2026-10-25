@@ -41,7 +41,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   const res = await request(app)
     .post('/api/vehicles')
-    .set('Authorization', `Bearer ${userToken}`)
+    .set('Authorization', `Bearer ${adminToken}`)
     .send({
       make: 'Honda',
       model: 'Civic',

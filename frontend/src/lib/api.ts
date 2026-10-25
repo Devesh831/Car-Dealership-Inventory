@@ -3,7 +3,7 @@
  * Handles base URL configuration, JWT token injection, and response parsing.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /** Retrieve stored JWT token from localStorage */
 export const getToken = (): string | null => localStorage.getItem('token');

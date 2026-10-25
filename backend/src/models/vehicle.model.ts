@@ -204,16 +204,16 @@ export const VehicleModel = {
   async purchase(id: number, quantity: number): Promise<Vehicle> {
     const db = getDB();
 
-    const vehicle = await this.findById(id);
-    if (!vehicle) throw new Error('Vehicle not found');
-    if (vehicle.quantity < quantity) {
+    const result = await db.run(
+      'UPDATE vehicles SET quantity = quantity - ? WHERE id = ? AND quantity >= ?',
+      [quantity, id, quantity]
+    );
+
+    if ((result.changes || 0) === 0) {
+      const vehicle = await this.findById(id);
+      if (!vehicle) throw new Error('Vehicle not found');
       throw new Error(`Insufficient stock. Only ${vehicle.quantity} units available.`);
     }
-
-    await db.run(
-      'UPDATE vehicles SET quantity = quantity - ? WHERE id = ?',
-      [quantity, id]
-    );
 
     return this.findById(id) as Promise<Vehicle>;
   },

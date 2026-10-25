@@ -14,7 +14,8 @@ A full-stack web application for managing a car dealership's vehicle inventory, 
 - [API Reference](#api-reference)
 - [Test Results](#test-results)
 - [Project Structure](#project-structure)
-- [AI Usage](#ai-usage)
+- [Application Screenshots](#application-screenshots)
+- [My AI Usage](#my-ai-usage)
 
 ---
 
@@ -23,7 +24,7 @@ A full-stack web application for managing a car dealership's vehicle inventory, 
 This system allows car dealership staff to:
 - Register and authenticate with role-based access (User / Admin)
 - Browse the full vehicle inventory with pagination
-- Search and filter vehicles by make, category, and price range
+- Search and filter vehicles by make, model, category, and price range
 - Purchase vehicles (reduces stock)
 - Restock vehicles (Admin only)
 - Add, edit, and delete vehicles from the inventory (Admin: add/edit/delete; Users: browse/purchase)
@@ -35,18 +36,18 @@ This system allows car dealership staff to:
 ### Authentication
 - ✅ User registration with email, username, password validation
 - ✅ Admin role assignment via secure admin code
-- ✅ JWT-based authentication (7-day expiry)
+- ✅ JWT-based authentication (24-hour default expiry, configurable)
 - ✅ Protected routes (middleware-enforced)
 - ✅ Password hashing with bcrypt (10 rounds)
 
 ### Vehicle Inventory
-- ✅ Full CRUD operations for vehicles
+- ✅ Full CRUD operations for vehicles (admin-only create, update, and delete)
 - ✅ 7 vehicle categories: Sedan, SUV, Truck, Coupe, Van, Electric, Hybrid
 - ✅ Stock tracking (quantity management)
 - ✅ Purchase flow with stock validation
-- ✅ Admin-only restock and delete operations
+- ✅ Admin-only restock, create, update, and delete operations
 - ✅ Server-side pagination (configurable page size)
-- ✅ Multi-filter search (make, category, price range) with case-insensitive partial match
+- ✅ Multi-filter search (make, model, category, price range) with case-insensitive partial match
 
 ### Frontend UI
 - ✅ Dark-themed responsive design with Tailwind CSS
@@ -59,6 +60,28 @@ This system allows car dealership staff to:
 - ✅ Pagination component
 - ✅ Skeleton loading states
 - ✅ Admin-only controls visible conditionally
+
+---
+
+## Application Screenshots
+
+### Admin Vehicle Management
+
+The admin dashboard displays inventory totals and the admin-only controls for restocking, editing, and deleting a vehicle.
+
+![Admin vehicle management dashboard](screenshots/admin-vehicle-management.png)
+
+### Regular User Dashboard
+
+The regular-user dashboard displays inventory and the purchase action without admin management controls.
+
+![Regular user vehicle dashboard](screenshots/regular-user-dashboard.png)
+
+### Regular User Purchase
+
+The purchase dialog shows the selected vehicle, its available stock, and the requested purchase quantity.
+
+![Regular user purchase dialog](screenshots/regular-user-purchase.png)
 
 ---
 
@@ -106,8 +129,9 @@ Car_Dealership_Inventory/
 │   │   └── server.ts           # HTTP server entry point
 │   └── tests/                  # Jest + Supertest TDD suites
 │       ├── auth.test.ts        # 17 tests
-│       ├── vehicles.test.ts    # 24 tests
-│       └── inventory.test.ts   # 12 tests
+│       ├── vehicles.test.ts    # 25 tests
+│       ├── inventory.test.ts   # 13 tests
+│       └── health.test.ts      # 3 tests
 │
 └── frontend/                   # React + Vite SPA
     └── src/
@@ -168,11 +192,11 @@ CREATE TABLE vehicles (
 cd backend
 npm install
 cp .env.example .env
-# Edit .env with your JWT_SECRET and ADMIN_REGISTRATION_CODE
+# Set private JWT_SECRET and ADMIN_REGISTRATION_CODE values in .env.
 npm run dev
 ```
 
-The backend runs on **http://localhost:3001**
+The backend runs on **http://localhost:5000**. The first start creates an empty SQLite database; an admin account must add vehicles before they appear in inventory.
 
 ### Frontend Setup
 
@@ -182,25 +206,18 @@ npm install
 npm run dev
 ```
 
-The frontend dev server runs on **http://localhost:5173** with API proxy to `:3001`.
+The frontend dev server runs on **http://localhost:5173** and proxies `/api` requests to the backend on port `5000`.
+For a deployed frontend, set `VITE_API_URL` to the backend API base URL ending in `/api` before building.
 
 ### Environment Variables (backend/.env)
 
-```env
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=your_super_secret_jwt_key_change_this
-JWT_EXPIRES_IN=7d
-ADMIN_REGISTRATION_CODE=ADMIN_SECRET_2024
-CORS_ORIGIN=http://localhost:5173
-DB_PATH=./data/car_dealership.sqlite
-```
+Use `backend/.env.example` as a template. Set `JWT_SECRET` to a private random value of at least 32 characters and choose a private `ADMIN_REGISTRATION_CODE`. The server refuses to start without `JWT_SECRET`; admin registration is unavailable until an admin code is configured. Never commit the real `.env` file.
 
 ---
 
 ## API Reference
 
-All endpoints except `/api/health` require `Authorization: Bearer <token>`.
+Vehicle endpoints and `/api/auth/me` require `Authorization: Bearer <token>`. Registration, login, and `/api/health` are public.
 
 ### Auth Endpoints
 
@@ -228,14 +245,15 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`.
 | `GET` | `/api/vehicles` | Required | Any | List vehicles (paginated) |
 | `GET` | `/api/vehicles/search` | Required | Any | Search with filters |
 | `GET` | `/api/vehicles/:id` | Required | Any | Get vehicle by ID |
-| `POST` | `/api/vehicles` | Required | Any | Add new vehicle |
-| `PUT` | `/api/vehicles/:id` | Required | Any | Update vehicle |
+| `POST` | `/api/vehicles` | Required | **Admin** | Add new vehicle |
+| `PUT` | `/api/vehicles/:id` | Required | **Admin** | Update vehicle |
 | `DELETE` | `/api/vehicles/:id` | Required | **Admin** | Delete vehicle |
 | `POST` | `/api/vehicles/:id/purchase` | Required | Any | Purchase (decrement stock) |
 | `POST` | `/api/vehicles/:id/restock` | Required | **Admin** | Restock (increment stock) |
 
 **Search Query Parameters:**
 - `make` — partial, case-insensitive text match
+- `model` — partial, case-insensitive text match
 - `category` — exact match (`Sedan`, `SUV`, etc.)
 - `minPrice` / `maxPrice` — numeric range
 - `page` / `limit` — pagination
@@ -244,18 +262,7 @@ All endpoints except `/api/health` require `Authorization: Bearer <token>`.
 
 ## Test Results
 
-```
-Test Suites: 3 passed, 3 total
-Tests:       53 passed, 53 total
-Snapshots:   0 total
-Time:        ~6.2s
-```
-
-| Suite | Tests | Status |
-|-------|-------|--------|
-| `auth.test.ts` | 17 | ✅ All pass |
-| `vehicles.test.ts` | 24 | ✅ All pass |
-| `inventory.test.ts` | 12 | ✅ All pass |
+See [TEST_REPORT.md](./TEST_REPORT.md) for the current verified backend and frontend test results.
 
 Run tests:
 ```bash
@@ -263,8 +270,14 @@ cd backend
 npm test
 ```
 
-Run with coverage:
 ```bash
+cd frontend
+npm test
+```
+
+Run backend coverage from the backend folder:
+```bash
+cd backend
 npm run test:coverage
 ```
 
@@ -305,9 +318,13 @@ backend/
 
 ---
 
-## AI Usage
+## Submission Status
 
-This project was developed with significant AI assistance from **Antigravity AI** (Google DeepMind). All AI-assisted commits are marked with:
+The assignment requires a public repository URL. No Git remote is configured in this checkout, so add the public repository link here after publishing the existing repository. A live deployment is optional.
+
+## My AI Usage
+
+This project used **Antigravity AI** (Google DeepMind) during the original implementation and **OpenAI Codex** for the current audit, fixes, tests, and documentation review. The existing AI-assisted commits include this trailer:
 
 ```
 Co-authored-by: Antigravity AI <antigravity@users.noreply.github.com>
@@ -315,12 +332,6 @@ Co-authored-by: Antigravity AI <antigravity@users.noreply.github.com>
 
 See [`PROMPTS.md`](./PROMPTS.md) for the complete, unedited AI conversation logs.
 
-AI assistance was used for:
-- System architecture and technology selection
-- TDD test suite design (Red phase — tests written before implementation)
-- Backend API implementation
-- Debugging SQLite singleton isolation and env var timing issues
-- React frontend component development
-- Documentation
+The tools were used for architecture discussion, test design, backend and frontend implementation, debugging, and documentation. This review used them to compare the current code to the assignment, implement the authorization and API configuration fixes, add tests, and correct the project documentation. The historical prompt log remains unchanged.
 
-All tests are real and were verified to pass. No commit timestamps were fabricated.
+AI assistance sped up code review and repetitive implementation work. The changes were checked against the assignment and verified with the documented test and build commands. No inventory records, screenshots, commit timestamps, or conversation logs were fabricated.

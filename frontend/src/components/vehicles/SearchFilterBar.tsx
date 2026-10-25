@@ -4,6 +4,7 @@ const CATEGORIES: VehicleCategory[] = ['Sedan', 'SUV', 'Truck', 'Coupe', 'Van', 
 
 export interface SearchFiltersState {
   make: string;
+  model: string;
   category: VehicleCategory | '';
   minPrice: string;
   maxPrice: string;
@@ -18,7 +19,7 @@ interface SearchFilterBarProps {
 }
 
 export function SearchFilterBar({ filters, onChange, onSearch, onClear, isLoading }: SearchFilterBarProps) {
-  const hasFilters = filters.make || filters.category || filters.minPrice || filters.maxPrice;
+  const hasFilters = filters.make || filters.model || filters.category || filters.minPrice || filters.maxPrice;
 
   const set = (field: keyof SearchFiltersState) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -31,7 +32,7 @@ export function SearchFilterBar({ filters, onChange, onSearch, onClear, isLoadin
   return (
     <div className="card p-4 mb-6">
       <div className="flex flex-wrap gap-3 items-end">
-        {/* Make/Model text search */}
+        {/* Make text search */}
         <div className="flex-1 min-w-[180px]">
           <label className="input-label">Search by make</label>
           <div className="relative">
@@ -49,6 +50,18 @@ export function SearchFilterBar({ filters, onChange, onSearch, onClear, isLoadin
               onKeyDown={handleKeyDown}
             />
           </div>
+        </div>
+
+        <div className="flex-1 min-w-[180px]">
+          <label className="input-label">Search by model</label>
+          <input
+            type="text"
+            className="input"
+            placeholder="Camry, Civic…"
+            value={filters.model}
+            onChange={set('model')}
+            onKeyDown={handleKeyDown}
+          />
         </div>
 
         {/* Category */}
