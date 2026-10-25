@@ -1,10 +1,10 @@
-# 🚗 Car Dealership Inventory Management System
+# Car Dealership Inventory Management System
 
 A full-stack web application for managing a car dealership's vehicle inventory, built with Node.js/TypeScript (backend) and React/TypeScript (frontend), following Test-Driven Development methodology.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -34,32 +34,32 @@ This system allows car dealership staff to:
 ## Features
 
 ### Authentication
-- ✅ User registration with email, username, password validation
-- ✅ Admin role assignment via secure admin code
-- ✅ JWT-based authentication (24-hour default expiry, configurable)
-- ✅ Protected routes (middleware-enforced)
-- ✅ Password hashing with bcrypt (10 rounds)
+- User registration with email, username, password validation
+- Admin role assignment via secure admin code
+- JWT-based authentication (24-hour default expiry, configurable)
+- Protected routes (middleware-enforced)
+- Password hashing with bcrypt (10 rounds)
 
 ### Vehicle Inventory
-- ✅ Full CRUD operations for vehicles (admin-only create, update, and delete)
-- ✅ 7 vehicle categories: Sedan, SUV, Truck, Coupe, Van, Electric, Hybrid
-- ✅ Stock tracking (quantity management)
-- ✅ Purchase flow with stock validation
-- ✅ Admin-only restock, create, update, and delete operations
-- ✅ Server-side pagination (configurable page size)
-- ✅ Multi-filter search (make, model, category, price range) with case-insensitive partial match
+- Full CRUD operations for vehicles (admin-only create, update, and delete)
+- 7 vehicle categories: Sedan, SUV, Truck, Coupe, Van, Electric, Hybrid
+- Stock tracking (quantity management)
+- Purchase flow with stock validation
+- Admin-only restock, create, update, and delete operations
+- Server-side pagination (configurable page size)
+- Multi-filter search (make, model, category, price range) with case-insensitive partial match
 
 ### Frontend UI
-- ✅ Dark-themed responsive design with Tailwind CSS
-- ✅ Login / Register pages with validation feedback
-- ✅ Vehicle grid with stock status indicators
-- ✅ Search/filter bar with live filtering
-- ✅ Inventory statistics panel
-- ✅ Modal dialogs for add/edit/delete/purchase/restock
-- ✅ Toast notifications for user feedback
-- ✅ Pagination component
-- ✅ Skeleton loading states
-- ✅ Admin-only controls visible conditionally
+- Dark-themed responsive design with Tailwind CSS
+- Login / Register pages with validation feedback
+- Vehicle grid with stock status indicators
+- Search/filter bar with live filtering
+- Inventory statistics panel
+- Modal dialogs for add/edit/delete/purchase/restock
+- Toast notifications for user feedback
+- Pagination component
+- Skeleton loading states
+- Admin-only controls visible conditionally
 
 ---
 
@@ -320,7 +320,11 @@ backend/
 
 ## Submission Status
 
-The assignment requires a public repository URL. No Git remote is configured in this checkout, so add the public repository link here after publishing the existing repository. A live deployment is optional.
+This project is available as a public GitHub repository:
+
+[Car Dealership Inventory Management System](https://github.com/Devesh831/Car-Dealership-Inventory)
+
+A live deployment is optional.
 
 ## My AI Usage
 
